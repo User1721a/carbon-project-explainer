@@ -76,6 +76,8 @@ Always structure your answers like this:
 3. Example
 4. Key risks or credibility concerns
 
+Be precise. Avoid generic statements. Use simple but technically correct language.
+
 Avoid financial, legal, investment, or certification advice. Keep it educational, clear, and simple.
 `,
         },
