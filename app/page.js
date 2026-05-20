@@ -7,6 +7,12 @@ export default function Home() {
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const examples = [
+    "What is MRV in carbon projects?",
+    "How do carbon credits work?",
+    "What is the difference between carbon removal and emissions reduction?",
+  ];
+
   async function handleExplain() {
     if (!question.trim()) {
       setAnswer("Please write a question first.");
@@ -56,14 +62,14 @@ export default function Home() {
         Carbon Project Explainer Tool
       </h1>
 
-     <p style={{ fontSize: "18px", color: "#333", marginBottom: "14px" }}>
-  Understand carbon projects. Clearly.
-</p>
+      <p style={{ fontSize: "18px", color: "#333", marginBottom: "14px" }}>
+        Understand carbon projects. Clearly.
+      </p>
 
-<p style={{ fontSize: "16px", color: "#555", marginBottom: "24px" }}>
-  Ask a question about carbon credits, AFOLU, MRV, afforestation,
-  reforestation, carbon removal, or climate projects.
-</p>
+      <p style={{ fontSize: "16px", color: "#555", marginBottom: "24px" }}>
+        Ask a question about carbon credits, AFOLU, MRV, afforestation,
+        reforestation, carbon removal, or climate projects.
+      </p>
 
       <textarea
         value={question}
@@ -79,6 +85,32 @@ export default function Home() {
           resize: "vertical",
         }}
       />
+
+      <div
+        style={{
+          marginTop: "16px",
+          display: "flex",
+          gap: "8px",
+          flexWrap: "wrap",
+        }}
+      >
+        {examples.map((example) => (
+          <button
+            key={example}
+            onClick={() => setQuestion(example)}
+            style={{
+              padding: "8px 12px",
+              fontSize: "14px",
+              border: "1px solid #ddd",
+              borderRadius: "999px",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            {example}
+          </button>
+        ))}
+      </div>
 
       <button
         onClick={handleExplain}
