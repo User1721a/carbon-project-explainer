@@ -4,40 +4,80 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function vehicleCalculation(question) {
+  const q = question.toLowerCase();
+
+  const factors = {
+    car: {
+      annualEmissionsTons: 4.6,
+      label: "average passenger car",
+    },
+    motorcycle: {
+      annualEmissionsTons: 0.8,
+      label: "average motorcycle",
+    },
+  };
+
+  let vehicle = null;
+
+  if (q.includes("motorcycle")) vehicle = "motorcycle";
+  if (q.includes("car")) vehicle = "car";
+
+  if (!vehicle) return null;
+
+  const emissions = factors[vehicle].annualEmissionsTons;
+  const credits = Math.ceil(emissions);
+
+  return `1. Short definition:
+A carbon credit usually represents 1 metric ton of CO₂e reduced, avoided, or removed.
+
+2. Calculation:
+For an ${factors[vehicle].label}, this demo uses an estimated annual footprint of about ${emissions} metric tons of CO₂e.
+
+Formula:
+${emissions} metric tons CO₂e ÷ 1 metric ton per credit = ${emissions} carbon credits
+
+Rounded practical estimate:
+About ${credits} carbon credit${credits > 1 ? "s" : ""} per year.
+
+3. Real-world context:
+This is a simplified educational estimate. Actual emissions depend on distance traveled, fuel efficiency, fuel type, maintenance, and driving conditions.
+
+4. Limitations or risks:
+Carbon credits are not automatically equivalent in quality. Credibility depends on MRV, additionality, permanence, leakage, and third-party verification. This is not financial, legal, or certification advice.`;
+}
+
 export async function POST(req) {
   const { question } = await req.json();
+
+  const calculatedAnswer = vehicleCalculation(question);
+
+  if (calculatedAnswer) {
+    return Response.json({
+      answer: calculatedAnswer,
+    });
+  }
 
   try {
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
-  role: "system",
-  content: `
+          role: "system",
+          content: `
 You are a climate and carbon markets expert.
 
 Your goal is to explain carbon-related concepts clearly and practically.
 
 Always structure your answers like this:
 
-1. Short definition (1–2 lines)
-2. Why it matters (real-world relevance)
-3. Quantitative example when possible
-4. Real-world context (AFOLU, carbon markets, MRV, etc.)
-5. Limitations or risks (credibility, additionality, etc.)
-
-Be precise. Avoid generic sustainability language. Include numbers whenever possible.
-`
-}
-
-Answer using this exact structure:
-
 1. Short definition
 2. Why it matters
 3. Example
 4. Key risks or credibility concerns
 
-Avoid financial, legal, investment, or certification advice. Keep it educational, clear, and simple.`,
+Avoid financial, legal, investment, or certification advice. Keep it educational, clear, and simple.
+`,
         },
         {
           role: "user",
@@ -49,21 +89,10 @@ Avoid financial, legal, investment, or certification advice. Keep it educational
     return Response.json({
       answer: completion.choices[0].message.content,
     });
-
   } catch (error) {
-    // Fallback response if AI fails
     return Response.json({
-      answer: `1. Short definition:
-Carbon credits represent one ton of CO₂ either removed from the atmosphere or avoided through a project.
-
-2. Why it matters:
-They are used to balance emissions and support climate projects such as reforestation or clean energy.
-
-3. Example:
-A company emitting CO₂ may purchase carbon credits from a forest conservation project to offset its emissions.
-
-4. Key risks or credibility concerns:
-Not all carbon credits are equally reliable. Issues include poor measurement (MRV), lack of permanence, or projects that would have happened anyway.`,
+      answer:
+        "The carbon explainer is temporarily unavailable. Please try again shortly.",
     });
   }
 }

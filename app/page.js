@@ -56,10 +56,14 @@ export default function Home() {
         Carbon Project Explainer Tool
       </h1>
 
-      <p style={{ fontSize: "18px", color: "#333", marginBottom: "24px" }}>
-        Ask a question about carbon credits, AFOLU, MRV, afforestation,
-        reforestation, carbon removal, or climate projects.
-      </p>
+     <p style={{ fontSize: "18px", color: "#333", marginBottom: "14px" }}>
+  Understand carbon projects. Clearly.
+</p>
+
+<p style={{ fontSize: "16px", color: "#555", marginBottom: "24px" }}>
+  Ask a question about carbon credits, AFOLU, MRV, afforestation,
+  reforestation, carbon removal, or climate projects.
+</p>
 
       <textarea
         value={question}
