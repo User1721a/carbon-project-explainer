@@ -15,7 +15,13 @@ export default function Home() {
     try {
       const res = await fetch("/api/explain", {
         method: "POST",
-        body: JSON.stringify({ prompt: input }),
+        body: JSON.stringify({
+  question: input,
+  mode: input.toLowerCase().includes("compare") ||
+    input.toLowerCase().includes("difference")
+      ? "compare"
+      : "evaluate",
+}),
       });
 
       const data = await res.json();
