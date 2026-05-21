@@ -6,16 +6,18 @@ export default function Home() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState("evaluate");
 
   const examples = [
-    "What is MRV in carbon projects?",
-    "How do carbon credits work?",
-    "What is the difference between carbon removal and emissions reduction?",
+    "Can carbon offsets be considered greenwashing?",
+    "How reliable is MRV in forest carbon projects?",
+    "What are the biggest risks in carbon markets?",
+    "Compare carbon removal and emissions reduction.",
   ];
 
   async function handleExplain() {
     if (!question.trim()) {
-      setAnswer("Please write a question first.");
+      setAnswer("Please describe a carbon project, claim, or question first.");
       return;
     }
 
@@ -27,7 +29,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, mode }),
     });
 
     const data = await response.json();
@@ -55,7 +57,7 @@ export default function Home() {
       }}
     >
       <p style={{ color: "#666", fontSize: "14px", marginBottom: "8px" }}>
-        Climate education tool
+        Climate decision-support tool
       </p>
 
       <h1 style={{ fontSize: "42px", marginBottom: "12px" }}>
@@ -63,18 +65,38 @@ export default function Home() {
       </h1>
 
       <p style={{ fontSize: "18px", color: "#333", marginBottom: "14px" }}>
-        Understand carbon projects. Clearly.
+        Understand carbon systems before you rely on them.
       </p>
 
       <p style={{ fontSize: "16px", color: "#555", marginBottom: "24px" }}>
-        Ask a question about carbon credits, AFOLU, MRV, afforestation,
-        reforestation, carbon removal, or climate projects.
+        Assess carbon credits, MRV logic, AFOLU, emissions reduction, carbon
+        removal, and project credibility through structured responses.
       </p>
+
+      <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+        {["explain", "evaluate", "compare"].map((item) => (
+          <button
+            key={item}
+            onClick={() => setMode(item)}
+            style={{
+              padding: "8px 14px",
+              borderRadius: "999px",
+              border: "1px solid #ddd",
+              backgroundColor: mode === item ? "#111" : "#fff",
+              color: mode === item ? "#fff" : "#111",
+              cursor: "pointer",
+              textTransform: "capitalize",
+            }}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
 
       <textarea
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
-        placeholder="Ask about carbon projects..."
+        placeholder="Describe a carbon project, claim, or question..."
         style={{
           width: "100%",
           height: "140px",
@@ -86,12 +108,16 @@ export default function Home() {
         }}
       />
 
+      <p style={{ marginTop: "16px", color: "#777", fontSize: "14px" }}>
+        Try assessing:
+      </p>
+
       <div
         style={{
-          marginTop: "16px",
           display: "flex",
           gap: "8px",
           flexWrap: "wrap",
+          marginBottom: "16px",
         }}
       >
         {examples.map((example) => (
@@ -116,7 +142,6 @@ export default function Home() {
         onClick={handleExplain}
         disabled={loading}
         style={{
-          marginTop: "16px",
           padding: "14px 24px",
           fontSize: "16px",
           border: "none",
@@ -127,7 +152,7 @@ export default function Home() {
           opacity: loading ? 0.6 : 1,
         }}
       >
-        {loading ? "Thinking..." : "Explain"}
+        {loading ? "Assessing..." : "Assess"}
       </button>
 
       {answer && (
@@ -150,8 +175,8 @@ export default function Home() {
       )}
 
       <p style={{ marginTop: "24px", color: "#777", fontSize: "13px" }}>
-        Educational use only. This tool does not provide financial, legal, or
-        certification advice.
+        This tool supports structured understanding. Critical decisions should
+        always be validated independently.
       </p>
     </main>
   );

@@ -4,7 +4,7 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-function vehicleCalculation(question) {
+function vehicleCalculation(question, mode) {
   const q = question.toLowerCase();
 
   const factors = {
@@ -23,7 +23,7 @@ function vehicleCalculation(question) {
   if (q.includes("motorcycle")) vehicle = "motorcycle";
   if (q.includes("car")) vehicle = "car";
 
-  if (!vehicle) return null;
+  if (!vehicle || mode !== "explain") return null;
 
   const emissions = factors[vehicle].annualEmissionsTons;
   const credits = Math.ceil(emissions);
@@ -47,10 +47,70 @@ This is a simplified educational estimate. Actual emissions depend on distance t
 Carbon credits are not automatically equivalent in quality. Credibility depends on MRV, additionality, permanence, leakage, and third-party verification. This is not financial, legal, or certification advice.`;
 }
 
-export async function POST(req) {
-  const { question } = await req.json();
+function getSystemPrompt(mode) {
+  const sharedRules = `
+Do not use the words "nature", "natural", or "environment" unless the user explicitly asks about those terms.
+Avoid generic sustainability language.
+Be precise, structured, and technically correct.
+Do not give financial, legal, investment, or certification advice.
+`;
 
-  const calculatedAnswer = vehicleCalculation(question);
+  if (mode === "compare") {
+    return `
+You are a climate and carbon markets expert.
+
+The user wants a clear comparison between carbon-related concepts, project types, or approaches.
+
+Structure your answer like this:
+
+1. Core difference
+2. When each is used
+3. Strengths
+4. Limitations
+5. Decision relevance
+
+${sharedRules}
+`;
+  }
+
+  if (mode === "explain") {
+    return `
+You are a climate and carbon markets expert.
+
+Your goal is to explain carbon-related concepts clearly and practically.
+
+Structure your answer like this:
+
+1. Short definition
+2. Why it matters
+3. Example
+4. Key risks or credibility concerns
+
+${sharedRules}
+`;
+  }
+
+  return `
+You are a climate and carbon markets expert.
+
+The user wants decision-relevant assessment, not generic explanation.
+
+Structure your answer like this:
+
+1. What this involves
+2. Potential benefits
+3. Key risks
+4. What determines credibility
+5. What to verify before relying on it
+
+${sharedRules}
+`;
+}
+
+export async function POST(req) {
+  const { question, mode = "evaluate" } = await req.json();
+
+  const calculatedAnswer = vehicleCalculation(question, mode);
 
   if (calculatedAnswer) {
     return Response.json({
@@ -64,22 +124,7 @@ export async function POST(req) {
       messages: [
         {
           role: "system",
-          content: `
-You are a climate and carbon markets expert.
-
-Your goal is to explain carbon-related concepts clearly and practically.
-
-Always structure your answers like this:
-
-1. Short definition
-2. Why it matters
-3. Example
-4. Key risks or credibility concerns
-
-Be precise. Avoid generic statements. Use simple but technically correct language.
-
-Avoid financial, legal, investment, or certification advice. Keep it educational, clear, and simple.
-`,
+          content: getSystemPrompt(mode),
         },
         {
           role: "user",
