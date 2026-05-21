@@ -5,7 +5,7 @@ const client = new OpenAI({
 });
 
 function vehicleCalculation(question, mode) {
-  const q = question.toLowerCase();
+  const q = (question || "").toLowerCase();
 
   const factors = {
     car: {
@@ -108,7 +108,30 @@ ${sharedRules}
 }
 
 export async function POST(req) {
-  const { question, mode = "evaluate" } = await req.json();
+  let body = {};
+
+  try {
+    body = await req.json();
+  } catch (error) {
+    return Response.json(
+      {
+        answer: "Invalid request. Please submit a valid question.",
+      },
+      { status: 400 }
+    );
+  }
+
+  const question = body.question || body.prompt || "";
+  const mode = body.mode || "evaluate";
+
+  if (!question.trim()) {
+    return Response.json(
+      {
+        answer: "Please describe a carbon project, claim, or question first.",
+      },
+      { status: 400 }
+    );
+  }
 
   const calculatedAnswer = vehicleCalculation(question, mode);
 
@@ -137,9 +160,14 @@ export async function POST(req) {
       answer: completion.choices[0].message.content,
     });
   } catch (error) {
-    return Response.json({
-      answer:
-        "The carbon explainer is temporarily unavailable. Please try again shortly.",
-    });
+    console.error("OpenAI API error:", error);
+
+    return Response.json(
+      {
+        answer:
+          "The carbon explainer is temporarily unavailable. Please try again shortly.",
+      },
+      { status: 500 }
+    );
   }
 }
