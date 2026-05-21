@@ -55,46 +55,66 @@ export default function Home() {
     <main
       style={{
         maxWidth: "760px",
-        margin: "80px auto",
+        margin: "96px auto",
         fontFamily: "Arial, sans-serif",
         padding: "20px",
         lineHeight: "1.5",
       }}
     >
-      <p style={{ color: "#666", fontSize: "14px", marginBottom: "8px" }}>
-        Climate decision-support tool
+      <p
+        style={{
+          color: "#888",
+          fontSize: "13px",
+          marginBottom: "12px",
+          letterSpacing: "0.3px",
+        }}
+      >
+        Decision support
       </p>
 
-      <h1 style={{ fontSize: "42px", marginBottom: "12px" }}>
-        Carbon Project Explainer Tool
+      <h1
+        style={{
+          fontSize: "48px",
+          lineHeight: "1.05",
+          marginBottom: "18px",
+          fontWeight: "600",
+          letterSpacing: "-1.5px",
+          color: "#111",
+        }}
+      >
+        Assess carbon claims.
       </h1>
 
-      <p style={{ fontSize: "18px", color: "#333", marginBottom: "14px" }}>
-        Understand carbon systems before you rely on them.
-      </p>
-
-      <p style={{ fontSize: "16px", color: "#555", marginBottom: "24px" }}>
-        Assess carbon credits, MRV logic, AFOLU, emissions reduction, carbon
-        removal, and project credibility through structured responses.
+      <p
+        style={{
+          fontSize: "18px",
+          color: "#444",
+          marginBottom: "34px",
+          maxWidth: "640px",
+        }}
+      >
+        Test credibility, identify risks, and understand what is actually being
+        claimed — before acting on it.
       </p>
 
       <textarea
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
-        placeholder="Describe a carbon project, claim, or question..."
+        placeholder="Describe a carbon project, credit claim, or framework question..."
         style={{
           width: "100%",
-          height: "140px",
-          padding: "16px",
+          height: "150px",
+          padding: "18px",
           fontSize: "16px",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
+          border: "1px solid #ddd",
+          borderRadius: "14px",
           resize: "vertical",
+          outline: "none",
         }}
       />
 
-      <p style={{ marginTop: "16px", color: "#777", fontSize: "14px" }}>
-        Try assessing:
+      <p style={{ marginTop: "18px", color: "#777", fontSize: "14px" }}>
+        Start with:
       </p>
 
       <div
@@ -102,7 +122,7 @@ export default function Home() {
           display: "flex",
           gap: "8px",
           flexWrap: "wrap",
-          marginBottom: "16px",
+          marginBottom: "18px",
         }}
       >
         {examples.map((example) => (
@@ -110,7 +130,7 @@ export default function Home() {
             key={example}
             onClick={() => setQuestion(example)}
             style={{
-              padding: "8px 12px",
+              padding: "8px 13px",
               fontSize: "14px",
               border: "1px solid #ddd",
               borderRadius: "999px",
@@ -127,10 +147,10 @@ export default function Home() {
         onClick={handleAssess}
         disabled={loading}
         style={{
-          padding: "14px 24px",
+          padding: "14px 26px",
           fontSize: "16px",
           border: "none",
-          borderRadius: "8px",
+          borderRadius: "10px",
           backgroundColor: "#111",
           color: "#fff",
           cursor: loading ? "not-allowed" : "pointer",
@@ -143,10 +163,10 @@ export default function Home() {
       {answer && (
         <section
           style={{
-            marginTop: "32px",
-            padding: "24px",
-            border: "1px solid #ddd",
-            borderRadius: "12px",
+            marginTop: "36px",
+            padding: "26px",
+            border: "1px solid #e5e5e5",
+            borderRadius: "18px",
             backgroundColor: "#fafafa",
             whiteSpace: "pre-wrap",
           }}
