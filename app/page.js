@@ -6,16 +6,8 @@ export default function Home() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState("evaluate");
 
-  const examples = [
-    "Can carbon offsets be considered greenwashing?",
-    "How reliable is MRV in forest carbon projects?",
-    "What are the biggest risks in carbon markets?",
-    "Compare carbon removal and emissions reduction.",
-  ];
-
-  async function handleExplain() {
+  async function handleAssess() {
     if (!question.trim()) {
       setAnswer("Please describe a carbon project, claim, or question first.");
       return;
@@ -24,12 +16,18 @@ export default function Home() {
     setLoading(true);
     setAnswer("Loading...");
 
+    const selectedMode =
+      question.toLowerCase().includes("compare") ||
+      question.toLowerCase().includes("difference")
+        ? "compare"
+        : "evaluate";
+
     const response = await fetch("/api/explain", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ question, mode }),
+      body: JSON.stringify({ question, mode: selectedMode }),
     });
 
     const data = await response.json();
@@ -45,6 +43,13 @@ export default function Home() {
     setAnswer(data.answer);
     setLoading(false);
   }
+
+  const examples = [
+    "Can carbon offsets be considered greenwashing?",
+    "How reliable is MRV in forest carbon projects?",
+    "What are the biggest risks in carbon markets?",
+    "Compare carbon removal and emissions reduction.",
+  ];
 
   return (
     <main
@@ -72,44 +77,6 @@ export default function Home() {
         Assess carbon credits, MRV logic, AFOLU, emissions reduction, carbon
         removal, and project credibility through structured responses.
       </p>
-
-      <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-        {[
-  { key: "evaluate", label: "Assess" },
-  { key: "compare", label: "Compare" },
-].map((item) => (
-  <button
-    key={item.key}
-    onClick={() => setMode(item.key)}
-    style={{
-      padding: "8px 14px",
-      borderRadius: "999px",
-      border: "1px solid #ddd",
-      backgroundColor: mode === item.key ? "#111" : "#fff",
-      color: mode === item.key ? "#fff" : "#111",
-      cursor: "pointer",
-    }}
-  >
-    {item.label}
-  </button>
-))}
-          <button
-            key={item}
-            onClick={() => setMode(item)}
-            style={{
-              padding: "8px 14px",
-              borderRadius: "999px",
-              border: "1px solid #ddd",
-              backgroundColor: mode === item ? "#111" : "#fff",
-              color: mode === item ? "#fff" : "#111",
-              cursor: "pointer",
-              textTransform: "capitalize",
-            }}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
 
       <textarea
         value={question}
@@ -157,7 +124,7 @@ export default function Home() {
       </div>
 
       <button
-        onClick={handleExplain}
+        onClick={handleAssess}
         disabled={loading}
         style={{
           padding: "14px 24px",
