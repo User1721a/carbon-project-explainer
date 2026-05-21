@@ -74,7 +74,25 @@ export default function Home() {
       </p>
 
       <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-        {["explain", "evaluate", "compare"].map((item) => (
+        {[
+  { key: "evaluate", label: "Assess" },
+  { key: "compare", label: "Compare" },
+].map((item) => (
+  <button
+    key={item.key}
+    onClick={() => setMode(item.key)}
+    style={{
+      padding: "8px 14px",
+      borderRadius: "999px",
+      border: "1px solid #ddd",
+      backgroundColor: mode === item.key ? "#111" : "#fff",
+      color: mode === item.key ? "#fff" : "#111",
+      cursor: "pointer",
+    }}
+  >
+    {item.label}
+  </button>
+))}
           <button
             key={item}
             onClick={() => setMode(item)}
