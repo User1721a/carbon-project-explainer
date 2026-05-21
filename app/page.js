@@ -1,187 +1,168 @@
 "use client";
-
 import { useState } from "react";
 
 export default function Home() {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [input, setInput] = useState("");
+  const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleAssess() {
-    if (!question.trim()) {
-      setAnswer("Please describe a carbon project, claim, or question first.");
-      return;
-    }
+    if (!input) return;
 
     setLoading(true);
-    setAnswer("Loading...");
+    setResponse("");
 
-    const selectedMode =
-      question.toLowerCase().includes("compare") ||
-      question.toLowerCase().includes("difference")
-        ? "compare"
-        : "evaluate";
+    try {
+      const res = await fetch("/api/explain", {
+        method: "POST",
+        body: JSON.stringify({ prompt: input }),
+      });
 
-    const response = await fetch("/api/explain", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question, mode: selectedMode }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setAnswer(
-        "The carbon explainer is temporarily unavailable. Please try again shortly."
-      );
-      setLoading(false);
-      return;
+      const data = await res.json();
+      setResponse(data.answer);
+    } catch (err) {
+      setResponse("System error. Try again.");
     }
 
-    setAnswer(data.answer);
     setLoading(false);
   }
-
-  const examples = [
-    "Can carbon offsets be considered greenwashing?",
-    "How reliable is MRV in forest carbon projects?",
-    "What are the biggest risks in carbon markets?",
-    "Compare carbon removal and emissions reduction.",
-  ];
 
   return (
     <main
       style={{
-        maxWidth: "760px",
-        margin: "96px auto",
-        fontFamily: "Arial, sans-serif",
-        padding: "20px",
-        lineHeight: "1.5",
+        maxWidth: "720px",
+        margin: "120px auto",
+        padding: "0 20px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
       }}
     >
-      <p
-        style={{
-          color: "#888",
-          fontSize: "13px",
-          marginBottom: "12px",
-          letterSpacing: "0.3px",
-        }}
-      >
-        Decision support
-      </p>
+      {/* HEADER */}
+      <div style={{ marginBottom: "40px" }}>
+        <p
+          style={{
+            fontSize: "13px",
+            color: "#888",
+            marginBottom: "12px",
+          }}
+        >
+          Decision interface
+        </p>
 
-      <h1
-        style={{
-          fontSize: "48px",
-          lineHeight: "1.05",
-          marginBottom: "18px",
-          fontWeight: "600",
-          letterSpacing: "-1.5px",
-          color: "#111",
-        }}
-      >
-        Assess carbon claims.
-      </h1>
+        <h1
+          style={{
+            fontSize: "34px",
+            fontWeight: "600",
+            letterSpacing: "-0.02em",
+            marginBottom: "12px",
+          }}
+        >
+          Carbon systems. Assessed.
+        </h1>
 
-      <p
-        style={{
-          fontSize: "18px",
-          color: "#444",
-          marginBottom: "34px",
-          maxWidth: "640px",
-        }}
-      >
-        Test credibility, identify risks, and understand what is actually being
-        claimed — before acting on it.
-      </p>
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#555",
+            lineHeight: "1.5",
+            maxWidth: "520px",
+          }}
+        >
+          Evaluate carbon projects, claims, and mechanisms through structured
+          reasoning — not narratives.
+        </p>
+      </div>
 
+      {/* INPUT */}
       <textarea
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        placeholder="Describe a carbon project, credit claim, or framework question..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Describe a project, claim, or question..."
         style={{
           width: "100%",
-          height: "150px",
-          padding: "18px",
-          fontSize: "16px",
+          height: "120px",
+          padding: "14px",
+          borderRadius: "10px",
           border: "1px solid #ddd",
-          borderRadius: "14px",
-          resize: "vertical",
+          fontSize: "14px",
+          marginBottom: "16px",
           outline: "none",
         }}
       />
 
-      <p style={{ marginTop: "18px", color: "#777", fontSize: "14px" }}>
-        Start with:
-      </p>
-
+      {/* SUGGESTIONS */}
       <div
         style={{
           display: "flex",
-          gap: "8px",
           flexWrap: "wrap",
-          marginBottom: "18px",
+          gap: "10px",
+          marginBottom: "20px",
         }}
       >
-        {examples.map((example) => (
+        {[
+          "Are carbon offsets structurally credible?",
+          "MRV reliability in forest projects",
+          "Key failure points in carbon markets",
+        ].map((item, i) => (
           <button
-            key={example}
-            onClick={() => setQuestion(example)}
+            key={i}
+            onClick={() => setInput(item)}
             style={{
-              padding: "8px 13px",
-              fontSize: "14px",
+              padding: "8px 12px",
+              borderRadius: "20px",
               border: "1px solid #ddd",
-              borderRadius: "999px",
-              backgroundColor: "#fff",
+              background: "#fff",
               cursor: "pointer",
+              fontSize: "13px",
             }}
           >
-            {example}
+            {item}
           </button>
         ))}
       </div>
 
+      {/* BUTTON */}
       <button
         onClick={handleAssess}
-        disabled={loading}
         style={{
-          padding: "14px 26px",
-          fontSize: "16px",
-          border: "none",
-          borderRadius: "10px",
-          backgroundColor: "#111",
+          background: "#000",
           color: "#fff",
-          cursor: loading ? "not-allowed" : "pointer",
-          opacity: loading ? 0.6 : 1,
+          padding: "12px 20px",
+          borderRadius: "10px",
+          border: "none",
+          fontSize: "14px",
+          cursor: "pointer",
         }}
       >
-        {loading ? "Assessing..." : "Assess"}
+        {loading ? "Analyzing..." : "Assess"}
       </button>
 
-      {answer && (
-        <section
+      {/* RESPONSE */}
+      {response && (
+        <div
           style={{
-            marginTop: "36px",
-            padding: "26px",
-            border: "1px solid #e5e5e5",
-            borderRadius: "18px",
-            backgroundColor: "#fafafa",
+            marginTop: "40px",
+            padding: "20px",
+            borderRadius: "12px",
+            background: "#f7f7f7",
             whiteSpace: "pre-wrap",
+            lineHeight: "1.6",
+            fontSize: "14px",
           }}
         >
-          {answer.split("\n").map((line, index) => (
-            <p key={index} style={{ marginBottom: "12px" }}>
-              {line}
-            </p>
-          ))}
-        </section>
+          {response}
+        </div>
       )}
 
-      <p style={{ marginTop: "24px", color: "#777", fontSize: "13px" }}>
-        This tool supports structured understanding. Critical decisions should
-        always be validated independently.
+      {/* FOOTNOTE */}
+      <p
+        style={{
+          marginTop: "40px",
+          fontSize: "12px",
+          color: "#888",
+        }}
+      >
+        Outputs are structured for decision support. Independent validation is
+        required.
       </p>
     </main>
   );
